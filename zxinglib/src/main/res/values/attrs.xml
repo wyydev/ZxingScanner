@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BarcodeScannerView">
+        <attr name="shouldScaleToFill" format="boolean" />
+        <attr name="maskColor" format="color" />
+        <attr name="scanLineColor" format="color" />
+        <attr name="scanLineHeight" format="dimension" />
+        <attr name="scanLineMargin" format="dimension" />
+        <attr name="scanLineDrawable" format="reference" />
+        <attr name="scanLineMoveDistance" format="dimension" />
+        <attr name="animTime" format="integer" />
+        <attr name="rectWidthRatio" format="float" />
+        <attr name="rectWidthHeightRatio" format="float" />
+        <attr name="squareDimensionRatio" format="float"/>
+        <attr name="rectTopOffset" format="dimension" />
+        <attr name="rectSquare" format="boolean" />
+        <attr name="borderColor" format="color" />
+        <attr name="borderStrokeWidth" format="dimension" />
+        <attr name="cornerRounded" format="boolean" />
+        <attr name="cornerRadius" format="dimension" />
+        <attr name="cornerStrokeWidth" format="dimension" />
+        <attr name="cornerLineLength" format="dimension" />
+        <attr name="cornerColor" format="color" />
+        <attr name="cornerInRect" format="boolean" />
+        <attr name="autoZoom" format="boolean" />
+        <attr name="autoFocusInterval" format="integer" />
+        <attr name="scanFullScreen" format="boolean"/>
+    </declare-styleable>
+</resources>
