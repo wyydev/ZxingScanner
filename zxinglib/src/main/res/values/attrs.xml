@@ -11,7 +11,7 @@
         <attr name="animTime" format="integer" />
         <attr name="rectWidthRatio" format="float" />
         <attr name="rectWidthHeightRatio" format="float" />
-        <attr name="squareDimensionRatio" format="float"/>
+        <attr name="squareDimensionRatio" format="float" />
         <attr name="rectTopOffset" format="dimension" />
         <attr name="rectSquare" format="boolean" />
         <attr name="borderColor" format="color" />
@@ -24,6 +24,15 @@
         <attr name="cornerInRect" format="boolean" />
         <attr name="autoZoom" format="boolean" />
         <attr name="autoFocusInterval" format="integer" />
-        <attr name="scanFullScreen" format="boolean"/>
+        <attr name="scanFullScreen" format="boolean" />
+        <attr name="tipText" format="string" />
+        <attr name="tipTextColor" format="color" />
+        <attr name="tipTextSize" format="dimension" />
+        <attr name="tipTextMargin" format="dimension" />
+        <attr name="tipTextGravity" format="enum">
+            <enum name="GRAVITY_TOP" value="1" />
+            <enum name="GRAVITY_BOTTOM" value="2" />
+        </attr>
+        <attr name="tipTextSingleLine" format="boolean"/>
     </declare-styleable>
 </resources>

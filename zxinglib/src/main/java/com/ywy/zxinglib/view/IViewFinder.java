@@ -5,9 +5,21 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
+import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 public interface IViewFinder {
+    int GRAVITY_TOP = 1;
+    int GRAVITY_BOTTOM = 2;
+
+    @IntDef({GRAVITY_TOP, GRAVITY_BOTTOM})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface TextGravity {
+    }
+
     /**
      * 扫码线颜色
      */
@@ -24,12 +36,12 @@ public interface IViewFinder {
     void setScanLineMargin(int scanLineMargin);
 
     /**
-     *  扫码线每次移动距离
+     * 扫码线每次移动距离
      */
     void setScanLineMoveDistance(@IntRange(from = 0) int scanLineMoveDistance);
 
     /**
-     *  扫码线图片资源
+     * 扫码线图片资源
      */
     void setScanLineDrawable(Drawable scanLineDrawable);
 
@@ -49,9 +61,9 @@ public interface IViewFinder {
     void setMaskColor(@ColorInt int maskColor);
 
     /**
-     *  扫码框占据控件比率 ，竖屏时根据宽计算，横屏时根据高计算
+     * 扫码框占据控件比率 ，竖屏时根据宽计算，横屏时根据高计算
      */
-    void setRectWidthRatio(@FloatRange(from = 0.0,to = 1.0) float rectWidthRatio);
+    void setRectWidthRatio(@FloatRange(from = 0.0, to = 1.0) float rectWidthRatio);
 
 
     /**
@@ -60,22 +72,22 @@ public interface IViewFinder {
     void setRectWidthHeightRatio(float rectWidthHeightRatio);
 
     /**
-     *  扫码框是否是正方形
+     * 扫码框是否是正方形
      */
     void setRectSquare(boolean square);
 
     /**
-     *  扫码框为方形时宽占据屏幕比率
+     * 扫码框为方形时宽占据屏幕比率
      */
     void setSquareDimensionRatio(float squareDimensionRatio);
 
     /**
-     *  扫码框距离顶部距离，如考虑Toolbar高度,全屏，Toolbar覆盖在上面，需要居中显示则可以将rectTopOffset设置为Toolbar高度
+     * 扫码框距离顶部距离，如考虑Toolbar高度,全屏，Toolbar覆盖在上面，需要居中显示则可以将rectTopOffset设置为Toolbar高度
      */
     void setRectTopOffset(int rectTopOffset);
 
     /**
-     *  扫码框边框颜色
+     * 扫码框边框颜色
      */
     void setBorderColor(@ColorInt int borderColor);
 
@@ -112,9 +124,41 @@ public interface IViewFinder {
 
     /**
      * 扫码框四个角在边框里面还是外面
-     * @param inRect
      */
     void setCornerInRect(boolean inRect);
+
+
+    /**
+     * 扫码提示文字
+     */
+    void setTipText(String tipText);
+
+    /**
+     * 提示文字颜色
+     */
+    void setTextColor(int textColor);
+
+    /**
+     * 提示文字size
+     */
+    void setTextSize(int textSize);
+
+    /**
+     * 提示文字距离扫码框距离
+     */
+    void setTextMargin(int textMargin);
+
+    /**
+     * 提示文字位置，扫码框顶部和扫码框底部
+     */
+    void setTextGravity(@TextGravity int textGravity);
+
+    /**
+     * 提示文字是否只显示一行
+     */
+
+    void setTextSingleLine(boolean textSingleLine);
+
     /**
      * 更新扫码区域并刷新视图
      */

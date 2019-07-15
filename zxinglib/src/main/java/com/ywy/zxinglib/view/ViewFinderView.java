@@ -12,11 +12,14 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Xfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -28,6 +31,7 @@ import com.ywy.util.DisplayUtils;
  */
 public class ViewFinderView extends View implements IViewFinder {
     private static final String TAG = "ViewFinderView";
+
 
     private Rect mFramingRect;
     private static final int MIN_DIMENSION_DIFF = 50;
@@ -44,22 +48,34 @@ public class ViewFinderView extends View implements IViewFinder {
     private int mScanLineMoveDistance;
     private float mScanLineTop;
     private long mAnimTime;
-
     private float mRectWidthRatio;
-    private float mRectWidthHeighRatio;
+    private float mRectWidthHeightRatio;
     private boolean mRectSquare;
     private float mSquareDimensionRatio;
     private int mRectTopOffset;
     private Paint mBorderPaint;
+    @ColorInt
     private int mBorderColor;
     private int mBorderStrokeWidth;
     private Paint mCornerPaint;
+    @ColorInt
     private int mCornerColor;
     private int mCornerStrokeWidth;
     private int mCornerLineLength;
     private boolean mCornerRounded;
     private int mCornerRadius;
     private boolean mCornerInRect;
+
+    private TextPaint mTextPaint;
+    private String mTipText;
+    private int mTextColor;
+    private int mTextSize;
+    private int mTextMargin;
+    @TextGravity
+    int mTextGravity;
+    private boolean mTextSingleLine;
+    private StaticLayout mStaticLayout;
+
 
     public ViewFinderView(Context context) {
         super(context);
@@ -111,6 +127,15 @@ public class ViewFinderView extends View implements IViewFinder {
             mCornerPaint.setPathEffect(new CornerPathEffect(mCornerRadius));
         }
 
+        mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mTextColor = Color.WHITE;
+        mTextSize = DisplayUtils.sp2px(context, 14);
+        mTipText = "将二维码/条码放入框内，即可自动扫描";
+        mTextGravity = GRAVITY_BOTTOM;
+        mTextSingleLine = true;
+        mTextMargin = DisplayUtils.dp2px(context, 5);
+        mTextPaint.setColor(mTextColor);
+        mTextPaint.setTextSize(mTextSize);
     }
 
 
@@ -166,7 +191,7 @@ public class ViewFinderView extends View implements IViewFinder {
 
     @Override
     public void setRectWidthHeightRatio(float rectWidthHeightRatio) {
-        mRectWidthHeighRatio = rectWidthHeightRatio;
+        mRectWidthHeightRatio = rectWidthHeightRatio;
     }
 
     @Override
@@ -235,6 +260,38 @@ public class ViewFinderView extends View implements IViewFinder {
         mCornerInRect = inRect;
     }
 
+    @Override
+    public void setTipText(String tipText) {
+        this.mTipText = tipText;
+    }
+
+    @Override
+    public void setTextColor(int textColor) {
+        this.mTextColor = textColor;
+        mTextPaint.setColor(mTextColor);
+
+    }
+
+    @Override
+    public void setTextSize(int textSize) {
+        this.mTextSize = textSize;
+        mTextPaint.setTextSize(mTextSize);
+    }
+
+    @Override
+    public void setTextMargin(int textMargin) {
+        this.mTextMargin = textMargin;
+    }
+
+    @Override
+    public void setTextGravity(@TextGravity int textGravity) {
+        this.mTextGravity = textGravity;
+    }
+
+    @Override
+    public void setTextSingleLine(boolean textSingleLine) {
+        this.mTextSingleLine = textSingleLine;
+    }
 
     @Override
     public void setupViewFinder() {
@@ -261,10 +318,14 @@ public class ViewFinderView extends View implements IViewFinder {
 
         drawScanLine(canvas);
 
+        drawText(canvas);
+
         moveScanLine();
     }
 
+
     RectF rectF = new RectF();
+
     public void drawViewFinderMask(Canvas canvas) {
         int width = canvas.getWidth();
         int height = canvas.getHeight();
@@ -360,6 +421,32 @@ public class ViewFinderView extends View implements IViewFinder {
 
     }
 
+
+    private void drawText(Canvas canvas) {
+        if (TextUtils.isEmpty(mTipText) || mStaticLayout == null) {
+            return;
+        }
+
+        canvas.save();
+        if (mTextGravity == GRAVITY_TOP) {
+            if (mTextSingleLine) {
+                canvas.translate(0, mFramingRect.top - mTextMargin - mStaticLayout.getHeight());
+            } else {
+                canvas.translate(mFramingRect.left, mFramingRect.top - mTextMargin - mStaticLayout.getHeight());
+            }
+        } else {
+            if (mTextSingleLine) {
+                canvas.translate(0, mFramingRect.bottom + mTextMargin);
+            } else {
+                canvas.translate(mFramingRect.left, mFramingRect.bottom + mTextMargin);
+            }
+        }
+        mStaticLayout.draw(canvas);
+        canvas.restore();
+
+    }
+
+
     private void moveScanLine() {
         if (mScanLineTop + mScanLineHeight >= mFramingRect.bottom - mScanLineHeight - 0.5f) {
             mScanLineTop = mFramingRect.top + 0.5f;
@@ -394,10 +481,10 @@ public class ViewFinderView extends View implements IViewFinder {
         } else {
             if (orientation != Configuration.ORIENTATION_PORTRAIT) {
                 mRectHeight = (int) (getHeight() * mRectWidthRatio);
-                mRectWidth = (int) (mRectWidthHeighRatio * mRectHeight);
+                mRectWidth = (int) (mRectWidthHeightRatio * mRectHeight);
             } else {
                 mRectWidth = (int) (getWidth() * mRectWidthRatio);
-                mRectHeight = (int) (mRectWidthHeighRatio * mRectWidth);
+                mRectHeight = (int) (mRectWidthHeightRatio * mRectWidth);
             }
         }
 
@@ -413,5 +500,15 @@ public class ViewFinderView extends View implements IViewFinder {
         int topOffset = (getHeight() - mRectHeight) / 2 + mRectTopOffset;
         mFramingRect = new Rect(leftOffset, topOffset, leftOffset + mRectWidth, topOffset + mRectHeight);
         mScanLineTop = mFramingRect.top + 0.5f;
+
+        if (TextUtils.isEmpty(mTipText)) {
+            mStaticLayout = null;
+            return;
+        }
+        if (mTextSingleLine) {
+            mStaticLayout = new StaticLayout(mTipText, mTextPaint, getWidth(), Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, true);
+        } else {
+            mStaticLayout = new StaticLayout(mTipText, mTextPaint, mRectWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, true);
+        }
     }
 }

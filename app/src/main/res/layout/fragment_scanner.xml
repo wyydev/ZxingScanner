@@ -12,7 +12,12 @@
         app:borderColor="@color/colorPrimary"
         app:cornerColor="@color/colorPrimary"
         app:scanLineColor="@color/colorPrimary"
+        app:tipTextColor="@color/colorPrimary"
+        app:tipTextGravity="GRAVITY_TOP"
+        app:tipText="将二维码/条码放入框内，即可自动扫描"
+        app:tipTextMargin="20dp"
         app:cornerInRect="false"
+        app:tipTextSize="20sp"
         app:scanLineMargin="20dp">
 
     </com.ywy.zxinglib.view.ZXingScannerView>

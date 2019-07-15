@@ -12,6 +12,7 @@ import android.hardware.Camera;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -22,6 +23,8 @@ import com.ywy.util.DisplayUtils;
 import com.ywy.zxinglib.R;
 import com.ywy.zxinglib.view.IViewFinder;
 import com.ywy.zxinglib.view.ViewFinderView;
+
+import static com.ywy.zxinglib.view.IViewFinder.GRAVITY_BOTTOM;
 
 /**
  * 扫码界面
@@ -67,6 +70,14 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
     private float mRectWidthRatio;
     private float mRectWidthHeightRatio;
     private float mSquareDimensionRatio;
+    private String mTipText;
+    private int mTextColor;
+    private int mTextSize;
+    private int mTextMargin;
+    @IViewFinder.TextGravity
+    int mTextGravity;
+    private boolean mTextSingleLine;
+
 
     public BarcodeScannerView(Context context) {
         super(context);
@@ -104,7 +115,12 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
             mRectWidthRatio = 5f / 8;
             mRectWidthHeightRatio = 1.4f;
         }
-
+        mTextColor = Color.WHITE;
+        mTextSize = DisplayUtils.sp2px(context, 14);
+        mTipText = "将二维码/条码放入框内，即可自动扫描";
+        mTextGravity = IViewFinder.GRAVITY_BOTTOM;
+        mTextSingleLine = true;
+        mTextMargin = DisplayUtils.dp2px(context, 5);
     }
 
     public BarcodeScannerView(Context context, AttributeSet attributeSet) {
@@ -158,11 +174,18 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
             mAutoZoom = a.getBoolean(R.styleable.BarcodeScannerView_autoZoom, true);
             mAutoFocusInterval = a.getInteger(R.styleable.BarcodeScannerView_autoFocusInterval, 1000);
             mScanFullScreen = a.getBoolean(R.styleable.BarcodeScannerView_scanFullScreen, false);
-//
+            mTipText = a.getString(R.styleable.BarcodeScannerView_tipText);
+            if (TextUtils.isEmpty(mTipText)){
+                mTipText = "将二维码/条码放入框内，即可自动扫描";
+            }
+            mTextColor = a.getColor(R.styleable.BarcodeScannerView_tipTextColor, Color.WHITE);
+            mTextSize = a.getDimensionPixelSize(R.styleable.BarcodeScannerView_tipTextSize, DisplayUtils.sp2px(context, 14));
+            mTextMargin = a.getDimensionPixelSize(R.styleable.BarcodeScannerView_tipTextMargin, DisplayUtils.dp2px(context, 5));
+            mTextGravity = a.getInt(R.styleable.BarcodeScannerView_tipTextGravity, GRAVITY_BOTTOM);
+            mTextSingleLine = a.getBoolean(R.styleable.BarcodeScannerView_tipTextSingleLine, true);
         } finally {
             a.recycle();
         }
-
         init();
     }
 
@@ -219,6 +242,12 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
         viewFinderView.setCornerRounded(mCornerRounded);
         viewFinderView.setCornerRadius(mCornerRadius);
         viewFinderView.setCornerInRect(mCornerInRect);
+        viewFinderView.setTipText(mTipText);
+        viewFinderView.setTextColor(mTextColor);
+        viewFinderView.setTextSize(mTextSize);
+        viewFinderView.setTextGravity(mTextGravity);
+        viewFinderView.setTextMargin(mTextMargin);
+        viewFinderView.setTextSingleLine(mTextSingleLine);
         return viewFinderView;
     }
 
@@ -255,6 +284,7 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
 
     public void setScanLineBitmap(Bitmap bitmap) {
         mViewFinderView.setScanLineBitmap(bitmap);
+        mViewFinderView.setupViewFinder();
     }
 
     public void setAnimTime(long animTime) {
@@ -270,7 +300,7 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
     }
 
 
-    public void setRectWidthRatio(@FloatRange(from = 0.0,to = 1.0) float rectWidthRatio) {
+    public void setRectWidthRatio(@FloatRange(from = 0.0, to = 1.0) float rectWidthRatio) {
         mRectWidthRatio = rectWidthRatio;
         mViewFinderView.setRectWidthRatio(rectWidthRatio);
         mViewFinderView.setupViewFinder();
@@ -353,6 +383,44 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
     public void setScanFullScreen(boolean scanFullScreen) {
         mScanFullScreen = scanFullScreen;
     }
+
+
+    public void setTipText(String tipText) {
+        this.mTipText = tipText;
+        mViewFinderView.setTipText(mTipText);
+        mViewFinderView.setupViewFinder();
+    }
+
+    public void setTextColor(int textColor) {
+        this.mTextColor = textColor;
+        mViewFinderView.setTextColor(mTextColor);
+        mViewFinderView.setupViewFinder();
+    }
+
+    public void setTextSize(int textSize) {
+        this.mTextSize = textSize;
+        mViewFinderView.setTextSize(mTextSize);
+        mViewFinderView.setupViewFinder();
+    }
+
+    public void setTextMargin(int textMargin) {
+        this.mTextMargin = textMargin;
+        mViewFinderView.setTextMargin(mTextMargin);
+        mViewFinderView.setupViewFinder();
+    }
+
+    public void setTextGravity(@IViewFinder.TextGravity int textGravity) {
+        this.mTextGravity = textGravity;
+        mViewFinderView.setTextGravity(mTextGravity);
+        mViewFinderView.setupViewFinder();
+    }
+
+    public void setTextSingleLine(boolean textSingleLine) {
+        this.mTextSingleLine = textSingleLine;
+        mViewFinderView.setTextSingleLine(mTextSingleLine);
+        mViewFinderView.setupViewFinder();
+    }
+
 
     public void startCamera(int cameraId) {
         if (mCameraHandlerThread == null) {
