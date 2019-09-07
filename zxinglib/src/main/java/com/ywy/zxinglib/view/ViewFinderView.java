@@ -407,12 +407,16 @@ public class ViewFinderView extends View implements IViewFinder {
         canvas.drawPath(path, mCornerPaint);
     }
 
+    RectF destRect = new RectF();
     public void drawScanLine(Canvas canvas) {
         Rect framingRect = getFramingRect();
         mScanLinePaint.setStyle(Paint.Style.FILL);
         if (mScanLineBitmap != null) {
-            RectF destRect = new RectF(framingRect.left + mScanLineMargin, mScanLineTop,
+//            RectF destRect = new RectF(framingRect.left + mScanLineMargin, mScanLineTop,
+//                    framingRect.right - mScanLineMargin, mScanLineTop + mScanLineBitmap.getHeight());
+            destRect.set(framingRect.left + mScanLineMargin, mScanLineTop,
                     framingRect.right - mScanLineMargin, mScanLineTop + mScanLineBitmap.getHeight());
+
             canvas.drawBitmap(mScanLineBitmap, null, destRect, mScanLinePaint);
         } else {
             canvas.drawRect(framingRect.left + mScanLineMargin, mScanLineTop, framingRect.right - mScanLineMargin,
