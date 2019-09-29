@@ -38,6 +38,8 @@ public class ScannerActivity extends BaseActivity implements ZXingScannerView.Re
         mScannerView.setMaskColor(Color.parseColor("#66ffffff"));
 //        mScannerView.setCornerRounded(true);
 //        mScannerView.setCornerRadius(20);
+        mScannerView.setAutoZoom(false);
+        mScannerView.setScanFullScreen(true);
         mScannerView.setAutoFocusInterval(1000);
         mScannerView.setCornerInRect(true);
         contentFrame.addView(mScannerView);

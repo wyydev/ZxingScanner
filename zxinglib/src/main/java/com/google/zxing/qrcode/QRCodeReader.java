@@ -143,20 +143,11 @@ public class QRCodeReader implements Reader {
             int maxZoom = parameters.getMaxZoom();
             int curZoom = parameters.getZoom();
 
-            if (qrWidth <= frameWidth / 6) {
-                if (curZoom == 0) {
-                    curZoom = maxZoom / 2;
-                }
-                Log.e("QRCodeReader", "放大 curZoom = " + curZoom);
-                parameters.setZoom(curZoom);
-                camera.setParameters(parameters);
-                return true;
-            } else if (qrWidth < frameWidth / 4) {
-                if (curZoom == 0) {
-                    curZoom = maxZoom / 3;
-                } else {
-                    curZoom += 5;
-                }
+            if (qrWidth < frameWidth / 8) {
+//                if (curZoom == 0) {
+//                    curZoom = maxZoom / 2;
+//                }
+                curZoom+=5;
                 if (curZoom > maxZoom) {
                     curZoom = maxZoom;
                 }
@@ -164,7 +155,21 @@ public class QRCodeReader implements Reader {
                 parameters.setZoom(curZoom);
                 camera.setParameters(parameters);
                 return true;
-            }
+            }/* else if (qrWidth < frameWidth / 8) {
+//                if (curZoom == 0) {
+//                    curZoom = maxZoom / 3;
+//                } else {
+//                    curZoom += 5;
+//                }
+                curZoom += 5;
+                if (curZoom > maxZoom) {
+                    curZoom = maxZoom;
+                }
+                Log.e("QRCodeReader", "放大 curZoom = " + curZoom);
+                parameters.setZoom(curZoom);
+                camera.setParameters(parameters);
+                return true;
+            }*/
         }
         return false;
     }
@@ -177,6 +182,7 @@ public class QRCodeReader implements Reader {
             float point2Y = points[1].getY();
             return (int) Math.sqrt(Math.abs(point1X - point2X) * Math.abs(point1X - point2X) +
                     Math.abs(point1Y - point2Y) * Math.abs(point1Y - point2Y));
+
         }
         return 0;
     }
@@ -293,6 +299,6 @@ public class QRCodeReader implements Reader {
     }
 
     public void setAutoZoom(boolean mAutoZoom) {
-
+       this.mAutoZoom = mAutoZoom;
     }
 }
