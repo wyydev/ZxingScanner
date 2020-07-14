@@ -3,6 +3,8 @@ package com.ywy.zxinglib.camera;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -16,10 +18,12 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.google.zxing.common.detector.MathUtils;
 import com.ywy.util.DisplayUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -176,13 +180,85 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     }
                     mCameraWrapper.mCamera.setParameters(parameters);
                 } else {
-                    Log.e(TAG,"不支持放大");
+                    Log.e(TAG, "不支持放大");
                 }
             }
             return super.onDoubleTap(e);
 
         }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+//            Toast.makeText(getContext(), "单击", Toast.LENGTH_SHORT).show();
+            handleFocus(e, mCameraWrapper.mCamera);
+            return super.onSingleTapConfirmed(e);
+        }
     });
+
+
+    private static Rect calculateTapArea(float x, float y, float coefficient, Camera.Size previewSize) {
+        float focusAreaSize = 300;
+        int areaSize = Float.valueOf(focusAreaSize * coefficient).intValue();
+        int centerX = (int) (x / previewSize.width - 1000);
+        int centerY = (int) (y / previewSize.height - 1000);
+
+        int left = clamp(centerX - areaSize / 2, -1000, 1000);
+        int top = clamp(centerY - areaSize / 2, -1000, 1000);
+
+        RectF rectF = new RectF(left, top, left + areaSize, top + areaSize);
+
+        return new Rect(Math.round(rectF.left), Math.round(rectF.top), Math.round(rectF.right), Math.round(rectF.bottom));
+    }
+
+    private static int clamp(int x, int min, int max) {
+        if (x > max) {
+            return max;
+        }
+        if (x < min) {
+            return min;
+        }
+        return x;
+    }
+
+
+    private static void handleFocus(MotionEvent event, Camera camera) {
+        Camera.Parameters params = camera.getParameters();
+        Camera.Size previewSize = params.getPreviewSize();
+        Rect focusRect = calculateTapArea(event.getX(), event.getY(), 1f, previewSize);
+
+        camera.cancelAutoFocus();
+
+        if (params.getMaxNumFocusAreas() > 0) {
+            List<Camera.Area> focusAreas = new ArrayList<>();
+            focusAreas.add(new Camera.Area(focusRect, 800));
+            params.setFocusAreas(focusAreas);
+        } else {
+            Log.i(TAG, "focus areas not supported");
+        }
+
+
+        Rect meteringRect = calculateTapArea(event.getX(), event.getY(), 1.5f, previewSize);
+        if (params.getMaxNumMeteringAreas() > 0) {
+            List<Camera.Area> meteringAreas = new ArrayList<>();
+            meteringAreas.add(new Camera.Area(meteringRect, 800));
+            params.setMeteringAreas(meteringAreas);
+        } else {
+            Log.i(TAG, "metering areas not supported");
+        }
+
+        final String currentFocusMode = params.getFocusMode();
+        params.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
+        camera.setParameters(params);
+
+        camera.autoFocus(new Camera.AutoFocusCallback() {
+            @Override
+            public void onAutoFocus(boolean success, Camera camera) {
+                Camera.Parameters params = camera.getParameters();
+                params.setFocusMode(currentFocusMode);
+                camera.setParameters(params);
+            }
+        });
+    }
 
 
     public void showCameraPreview() {
@@ -236,6 +312,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         Camera.Size optimalSize = getOptimalPreviewSize();
         Camera.Parameters parameters = mCameraWrapper.mCamera.getParameters();
         parameters.setPreviewSize(optimalSize.width, optimalSize.height);
+        if (!mAutoFocus) {
+            //连续拍照模式
+            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        }
         mCameraWrapper.mCamera.setParameters(parameters);
         adjustViewSize(optimalSize);
     }

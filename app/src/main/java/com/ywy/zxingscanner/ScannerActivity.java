@@ -32,16 +32,19 @@ public class ScannerActivity extends BaseActivity implements ZXingScannerView.Re
         formatList.add(BarcodeFormat.QR_CODE);
         formatList.add(BarcodeFormat.EAN_13);
         mScannerView.setFormats(formatList);
-        mScannerView.setRectWidthRatio(0.65f);
-        mScannerView.setRectWidthHeightRatio(1.4f);
+        mScannerView.setRectWidthRatio(0.8f);
+//        mScannerView.setRectWidthHeightRatio(1.4f);
+        mScannerView.setRectWidthHeightRatio(0.7f);
         mScannerView.setBorderColor(Color.WHITE);
-        mScannerView.setMaskColor(Color.parseColor("#66ffffff"));
+        mScannerView.setMaskColor(Color.parseColor("#00000000"));
 //        mScannerView.setCornerRounded(true);
 //        mScannerView.setCornerRadius(20);
-        mScannerView.setAutoZoom(false);
-        mScannerView.setScanFullScreen(true);
+        mScannerView.setAutoZoom(true);
+        mScannerView.setScanFullScreen(false);
         mScannerView.setAutoFocusInterval(1000);
+        mScannerView.setAutoFocus(false);
         mScannerView.setCornerInRect(true);
+        mScannerView.setAspectTolerance(1.2f);
         contentFrame.addView(mScannerView);
     }
 

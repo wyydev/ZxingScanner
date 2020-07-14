@@ -4,3 +4,9 @@
 
 ## 参考
 [barcodescanner](https://github.com/dm77/barcodescanner)
+
+## 修改记录
+
+* 1.0.2
+1. 优化二维码突然放大至超过扫码框问题
+2. fix自动放大控制不生效问题

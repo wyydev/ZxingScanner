@@ -14,8 +14,7 @@
         <activity android:name=".BaseActivity"></activity>
         <activity android:name=".ScannerFragmentActivity" />
         <activity
-            android:name=".ScannerActivity"
-            android:screenOrientation="landscape" />
+            android:name=".ScannerActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
