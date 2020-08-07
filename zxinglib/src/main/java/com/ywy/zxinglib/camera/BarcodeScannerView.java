@@ -35,7 +35,7 @@ import static com.ywy.zxinglib.view.IViewFinder.GRAVITY_BOTTOM;
 public abstract class BarcodeScannerView extends FrameLayout implements Camera.PreviewCallback {
 
     private CameraWrapper mCameraWrapper;
-    private CameraPreview mPreview;
+    protected CameraPreview mPreview;
     private IViewFinder mViewFinderView;
     private Rect mFramingRectInPreview;
     private CameraHandlerThread mCameraHandlerThread;

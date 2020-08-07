@@ -2,6 +2,7 @@ package com.ywy.zxinglib.camera;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -269,7 +270,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 setupCameraParameters();
                 mCameraWrapper.mCamera.setPreviewDisplay(getHolder());
                 mCameraWrapper.mCamera.setDisplayOrientation(getDisplayOrientation());
-                mCameraWrapper.mCamera.setOneShotPreviewCallback(mPreviewCallback);
+//                mCameraWrapper.mCamera.setOneShotPreviewCallback(mPreviewCallback);
+                setPreviewCallbackImpl();
                 mCameraWrapper.mCamera.startPreview();
                 if (mAutoFocus) {
                     if (mSurfaceCreated) {
@@ -286,6 +288,24 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+
+    private byte[] buffer = null;
+
+    private void setPreviewCallbackImpl() {
+        if (buffer == null) {
+            buffer = new byte[this.getWidth()
+                    * this.getHeight() * ImageFormat.getBitsPerPixel(ImageFormat.NV21) / 8];
+        }
+        if (mCameraWrapper.mCamera != null) {
+            mCameraWrapper.mCamera.addCallbackBuffer(buffer);
+            mCameraWrapper.mCamera.setPreviewCallback(mPreviewCallback);
+        }
+    }
+
+    public byte[] getBuffer() {
+        return buffer;
+    }
+
     public void safeAutoFocus() {
         try {
             mCameraWrapper.mCamera.autoFocus(autoFocusCB);
@@ -300,7 +320,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 mPreviewing = false;
                 getHolder().removeCallback(this);
                 mCameraWrapper.mCamera.cancelAutoFocus();
-                mCameraWrapper.mCamera.setOneShotPreviewCallback(null);
+
+                mCameraWrapper.mCamera.setPreviewCallback(null);
+//              mCameraWrapper.mCamera.setOneShotPreviewCallback(null);
                 mCameraWrapper.mCamera.stopPreview();
             } catch (Exception e) {
                 Log.e(TAG, e.toString(), e);
